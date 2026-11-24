@@ -269,3 +269,16 @@ create policy imagenes_actualizar on storage.objects for update to authenticated
 drop policy if exists imagenes_borrar on storage.objects;
 create policy imagenes_borrar on storage.objects for delete to authenticated
   using (bucket_id = 'imagenes' and ((storage.foldername(name))[1] = auth.uid()::text or public.es_admin()));
+
+-- =====================================================================
+--  Endurecimiento (recomendaciones del revisor de seguridad de Supabase)
+-- =====================================================================
+create or replace function public.hoy_co()
+returns date language sql stable set search_path = public as $$
+  select (now() at time zone 'America/Bogota')::date
+$$;
+revoke execute on function public.manejar_nuevo_usuario() from public, anon, authenticated;
+revoke execute on function public.proteger_negocio() from public, anon, authenticated;
+revoke execute on function public.limitar_productos() from public, anon, authenticated;
+revoke execute on function public.solicitar_premium() from anon;
+revoke execute on function public.resumen_eventos() from anon;
