@@ -5,6 +5,7 @@ import { cat, cop, waLink, type Negocio } from "@/lib/datos";
 import { usuarioActual } from "@/lib/supabase/server";
 import { LogoNegocio, Verificado } from "@/components/TarjetaNegocio";
 import { BotonWhatsApp, RegistrarVista } from "@/components/Metrica";
+import { Asistente } from "@/components/Asistente";
 
 async function cargar(slug: string) {
   const { supabase, user } = await usuarioActual();
@@ -100,14 +101,32 @@ export default async function PerfilNegocio(props: PageProps<"/n/[slug]">) {
         </section>
       )}
 
-      <div className="sticky bottom-[68px] z-20 mt-6 pb-3 md:bottom-0">
-        <BotonWhatsApp
-          negocio={n.id}
-          href={waLink(n.whatsapp, `Hola ${n.nombre}, te encontré en El Mercadito 🛒 y quiero más información.`)}
-          className="btn-wa w-full py-4! text-base! shadow-[0_8px_24px_rgba(37,211,102,.35)]"
-        >
-          Escribir por WhatsApp
-        </BotonWhatsApp>
+      <div className="sticky bottom-[68px] z-20 mt-6 flex gap-2 pb-3 md:bottom-0">
+        {n.plan === "premium" ? (
+          <>
+            <div className="flex-1">
+              <Asistente
+                negocio={{ id: n.id, nombre: n.nombre, whatsapp: n.whatsapp, emoji: c.e, logo: n.logo_url }}
+                sugerencias={["¿Qué me recomiendas?", ...productos.slice(0, 2).map((p) => `Quiero ${p.nombre}`)]}
+              />
+            </div>
+            <BotonWhatsApp
+              negocio={n.id}
+              href={waLink(n.whatsapp, `Hola ${n.nombre}, te encontré en El Mercadito 🛒 y quiero más información.`)}
+              className="btn-wa w-14 flex-none px-0! text-xl! shadow-[0_8px_24px_rgba(37,211,102,.35)]"
+            >
+              <span aria-label="WhatsApp">💬</span>
+            </BotonWhatsApp>
+          </>
+        ) : (
+          <BotonWhatsApp
+            negocio={n.id}
+            href={waLink(n.whatsapp, `Hola ${n.nombre}, te encontré en El Mercadito 🛒 y quiero más información.`)}
+            className="btn-wa w-full py-4! text-base! shadow-[0_8px_24px_rgba(37,211,102,.35)]"
+          >
+            Escribir por WhatsApp
+          </BotonWhatsApp>
+        )}
       </div>
     </div>
   );
