@@ -63,9 +63,10 @@ where id = (select id from auth.users where email = 'tucorreo@gmail.com');
    - **Redirect URLs:** agrega `https://TU-URL.vercel.app/**`.
 
 ### 5. Asistente de pedidos con IA (plan Premium)
-1. Crea una llave en [console.anthropic.com](https://console.anthropic.com) (requiere cargar crédito).
-2. En Vercel → **Settings → Environment Variables** agrega `ANTHROPIC_API_KEY` con esa llave y vuelve a desplegar.
-3. El asistente aparece solo en perfiles **Premium**. Límites para cuidar el gasto: 40 mensajes por visitante al día y 400 por tienda al día (función `consumir_asistente`).
+1. Crea una llave gratis en [Google AI Studio](https://aistudio.google.com/apikey).
+2. En Vercel → **Settings → Environment Variables** agrega `GEMINI_API_KEY` con esa llave y vuelve a desplegar.
+3. Para usar Claude en su lugar, borra `GEMINI_API_KEY` y agrega `ANTHROPIC_API_KEY` (requiere crédito en console.anthropic.com).
+4. El asistente aparece solo en perfiles **Premium**. Límites para cuidar el gasto: 40 mensajes por visitante al día y 400 por tienda al día (función `consumir_asistente`).
 
 ### 6. Correos de acceso (importante antes de lanzar)
 El servidor de correo que trae Supabase por defecto **solo envía unos pocos correos por hora** y es para pruebas. Antes de abrirlo a los emprendedores de Lorica:

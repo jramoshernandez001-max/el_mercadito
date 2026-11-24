@@ -1,38 +1,12 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse, type NextRequest } from "next/server";
 import { TIPOS, cat, cop, type Negocio } from "@/lib/datos";
 import type { ItemPedido, Pedido } from "@/lib/pedido";
 import { crearClienteServidor } from "@/lib/supabase/server";
+import { preguntarIA, proveedorActivo, type Msg } from "@/lib/ia";
 
 export const maxDuration = 30;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-type Msg = { role: "user" | "assistant"; content: string };
-
-const HERRAMIENTA: Anthropic.Tool = {
-  name: "confirmar_pedido",
-  description:
-    "Cierra el pedido. Llámala solo cuando el cliente ya confirmó explícitamente el resumen y tienes productos, cantidades, nombre y forma de entrega (y dirección si es domicilio).",
-  input_schema: {
-    type: "object",
-    properties: {
-      items: {
-        type: "array",
-        description: "Productos del catálogo con su código (P1, P2…) y cantidad",
-        items: {
-          type: "object",
-          properties: { codigo: { type: "string" }, cantidad: { type: "integer", minimum: 1, maximum: 99 } },
-          required: ["codigo", "cantidad"],
-        },
-      },
-      nombre_cliente: { type: "string" },
-      entrega: { type: "string", enum: ["domicilio", "recoger"] },
-      direccion: { type: "string", description: "Dirección o barrio, si es domicilio" },
-      notas: { type: "string", description: "Indicaciones extra del cliente, si las hay" },
-    },
-    required: ["items", "nombre_cliente", "entrega"],
-  },
-};
 
 function instrucciones(n: Negocio) {
   const c = cat(n.categoria);
@@ -89,7 +63,7 @@ export async function POST(request: NextRequest) {
   if (!visitante || !body.negocio || !UUID.test(body.negocio) || !mensajes.length || mensajes[mensajes.length - 1].role !== "user") {
     return NextResponse.json({ error: "solicitud" }, { status: 400 });
   }
-  if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ error: "no_configurado" }, { status: 503 });
+  if (!proveedorActivo()) return NextResponse.json({ error: "no_configurado" }, { status: 503 });
 
   const supabase = await crearClienteServidor();
   const { data } = await supabase
@@ -104,25 +78,12 @@ export async function POST(request: NextRequest) {
   if (!permitido) return NextResponse.json({ error: "limite" }, { status: 429 });
 
   try {
-    const anthropic = new Anthropic();
-    const r = await anthropic.messages.create({
-      model: process.env.ANTHROPIC_MODEL || "claude-haiku-5-5",
-      max_tokens: 600,
-      system: instrucciones(negocio),
-      tools: [HERRAMIENTA],
-      messages: mensajes,
-    });
-
-    let texto = r.content
-      .filter((b): b is Anthropic.TextBlock => b.type === "text")
-      .map((b) => b.text)
-      .join("\n")
-      .trim();
+    const ia = await preguntarIA(instrucciones(negocio), mensajes);
+    let texto = ia.texto;
 
     let pedido: Pedido | null = null;
-    const uso = r.content.find((b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "confirmar_pedido");
-    if (uso) {
-      const inp = uso.input as { items?: { codigo?: string; cantidad?: number }[]; nombre_cliente?: string; entrega?: string; direccion?: string; notas?: string };
+    if (ia.pedido) {
+      const inp = ia.pedido;
       const catalogo = [...(negocio.productos ?? [])].sort((a, b) => a.orden - b.orden);
       const items: ItemPedido[] = [];
       for (const it of inp.items ?? []) {
