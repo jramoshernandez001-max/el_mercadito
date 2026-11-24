@@ -64,7 +64,7 @@ export default async function Planes() {
         <div className={`${tarjeta} ring-2 ring-verde`}>
           <h3 className="font-bold">Premium</h3>
           <p className="text-3xl font-extrabold tracking-tight">{cop(PRECIO_PREMIUM)}<span className="text-sm font-semibold text-gris"> /mes</span></p>
-          <Lista items={["Todo lo del plan Básico", `Hasta ${LIMITE.premium} productos con foto`, ["Chatbot que atiende a tus clientes y te envía solo los pedidos cerrados a WhatsApp", "Pronto"], "Insignia de verificado", "Estadísticas de visitas por día", "Prioridad para reservar anuncios"]} />
+          <Lista items={["Todo lo del plan Básico", `Hasta ${LIMITE.premium} productos con foto`, "Chatbot que atiende a tus clientes y te envía solo los pedidos cerrados a WhatsApp", "Insignia de verificado", "Estadísticas de visitas por día", "Prioridad para reservar anuncios"]} />
           <div className="mt-auto">{botonPremium}</div>
         </div>
         <div className={tarjeta}>
