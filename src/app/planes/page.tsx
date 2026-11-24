@@ -6,11 +6,10 @@ import { solicitarPremium } from "./acciones";
 
 export const metadata: Metadata = { title: "Planes", description: "Perfil básico gratis para siempre. Premium y anuncios locales para crecer." };
 
-function Lista({ si, no = [] }: { si: string[]; no?: string[] }) {
+function Lista({ items }: { items: string[] }) {
   return (
     <ul className="grid gap-2 text-sm">
-      {si.map((t) => <li key={t} className="flex gap-2"><span className="font-extrabold text-verde">✓</span>{t}</li>)}
-      {no.map((t) => <li key={t} className="flex gap-2 text-gris"><span className="text-[#A0AABA]">–</span>{t}</li>)}
+      {items.map((t) => <li key={t} className="flex gap-2"><span className="font-bold text-verde">✓</span>{t}</li>)}
     </ul>
   );
 }
@@ -30,51 +29,45 @@ export default async function Planes() {
 
   let botonPremium: React.ReactNode;
   if (negocio?.plan === "premium") botonPremium = <button className="btn-borde w-full" disabled>Ya eres Premium</button>;
-  else if (!user) botonPremium = <Link href="/ingresar?next=/planes" className="btn-navy w-full">Ingresa para solicitarlo</Link>;
-  else if (!negocio) botonPremium = <Link href="/mi-negocio" className="btn-navy w-full">Primero crea tu perfil</Link>;
-  else if (estado === "pendiente") botonPremium = <button className="btn-borde w-full" disabled>Solicitud en revisión</button>;
+  else if (!user) botonPremium = <Link href="/ingresar?next=/planes" className="btn-navy w-full">Solicitar</Link>;
+  else if (!negocio) botonPremium = <Link href="/mi-negocio" className="btn-navy w-full">Solicitar</Link>;
+  else if (estado === "pendiente") botonPremium = <button className="btn-borde w-full" disabled>En revisión</button>;
   else
     botonPremium = (
       <form action={solicitarPremium}>
-        <button className="btn-verde w-full">{estado === "rechazada" ? "Solicitar de nuevo" : "Solicitar Premium"}</button>
+        <button className="btn-verde w-full">{estado === "rechazada" ? "Solicitar de nuevo" : "Solicitar"}</button>
       </form>
     );
 
+  const tarjeta = "flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-tarjeta";
   return (
-    <div className="mx-auto max-w-[1080px] px-4">
-      <div className="pt-[22px] pb-1.5">
-        <h1 className="text-2xl font-bold tracking-[-0.03em]">Planes</h1>
-        <p className="mt-1 text-sm text-gris">El perfil básico es gratis para siempre. Premium y la publicidad local sostienen la plataforma.</p>
-      </div>
-      <div className="mt-4 grid gap-[14px] md:grid-cols-3">
-        <div className="flex flex-col gap-3 rounded-[20px] border-2 border-transparent bg-white p-[22px] shadow-tarjeta">
-          <span className="pill self-start">Para empezar</span>
-          <h3 className="text-lg font-bold">Básico</h3>
-          <div className="text-[30px] font-extrabold tracking-[-0.03em]">$0 <small className="text-sm font-semibold text-gris">para siempre</small></div>
-          <Lista si={["Perfil permanente", `Hasta ${LIMITE.basico} productos o servicios con foto`, "Contacto directo por WhatsApp", "Aparece en búsquedas y en la rotación diaria", "Visitas y clics totales"]} no={["Insignia de verificado", "Estadísticas por día"]} />
-          <Link href="/mi-negocio" className="btn-borde mt-auto w-full">{negocio ? "Ir a mi negocio" : "Empezar gratis"}</Link>
+    <div className="mx-auto max-w-[1000px] px-4">
+      <h1 className="pt-10 pb-8 text-center text-[30px] leading-tight font-extrabold tracking-[-0.03em] md:text-4xl">Planes</h1>
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className={tarjeta}>
+          <h3 className="font-bold">Básico</h3>
+          <p className="text-3xl font-extrabold tracking-tight">Gratis</p>
+          <Lista items={["Perfil permanente", `${LIMITE.basico} productos`, "Contacto por WhatsApp"]} />
+          <Link href="/mi-negocio" className="btn-borde mt-auto w-full">{negocio ? "Mi negocio" : "Empezar"}</Link>
         </div>
-        <div className="flex flex-col gap-3 rounded-[20px] border-2 border-verde bg-white p-[22px] shadow-tarjeta">
-          <span className="pill-verde self-start">Recomendado</span>
-          <h3 className="text-lg font-bold">Premium</h3>
-          <div className="text-[30px] font-extrabold tracking-[-0.03em]">{cop(PRECIO_PREMIUM)} <small className="text-sm font-semibold text-gris">/ mes</small></div>
-          <Lista si={["Todo lo del plan Básico", `Hasta ${LIMITE.premium} productos o servicios`, "Insignia ✓ Verificado", "Estadísticas de visitas por día", "Prioridad para anunciar en la portada"]} />
+        <div className={`${tarjeta} ring-2 ring-verde`}>
+          <h3 className="font-bold">Premium</h3>
+          <p className="text-3xl font-extrabold tracking-tight">{cop(PRECIO_PREMIUM)}<span className="text-sm font-semibold text-gris"> /mes</span></p>
+          <Lista items={[`${LIMITE.premium} productos`, "Insignia de verificado", "Estadísticas por día"]} />
           <div className="mt-auto">{botonPremium}</div>
-          <p className="text-[13px] text-gris">El pago se coordina por WhatsApp con el equipo. Premium no te pone por encima de nadie en las búsquedas.</p>
         </div>
-        <div className="flex flex-col gap-3 rounded-[20px] border-2 border-transparent bg-white p-[22px] shadow-tarjeta">
-          <span className="pill self-start bg-orange-50 text-orange-800">Negocios</span>
-          <h3 className="text-lg font-bold">Anuncio local</h3>
-          <div className="text-[30px] font-extrabold tracking-[-0.03em]">{cop(PRECIO_ANUNCIO)} <small className="text-sm font-semibold text-gris">/ semana</small></div>
-          <Lista si={["Banner en la página de inicio", "Marcado claramente como “Anuncio”", "Enlace directo a tu perfil", "Ideal para promociones y fechas especiales"]} />
+        <div className={tarjeta}>
+          <h3 className="font-bold">Anuncio</h3>
+          <p className="text-3xl font-extrabold tracking-tight">{cop(PRECIO_ANUNCIO)}<span className="text-sm font-semibold text-gris"> /semana</span></p>
+          <Lista items={["Banner en el inicio", "Enlace a tu perfil"]} />
           {WHATSAPP_EQUIPO ? (
-            <a className="btn-borde mt-auto w-full" target="_blank" rel="noopener noreferrer" href={waLink(WHATSAPP_EQUIPO, "Hola, quiero reservar un anuncio local en El Mercadito.")}>Reservar por WhatsApp</a>
+            <a className="btn-borde mt-auto w-full" target="_blank" rel="noopener noreferrer" href={waLink(WHATSAPP_EQUIPO, "Hola, quiero reservar un anuncio en El Mercadito.")}>Reservar</a>
           ) : (
-            <p className="mt-auto text-[13px] text-gris">Escríbenos para reservar tu semana.</p>
+            <span className="mt-auto text-center text-sm text-gris">Pronto</span>
           )}
         </div>
       </div>
-      <div className="equidad mt-4"><span>⚖️</span><span><b>Nuestra promesa:</b> la visibilidad en El Mercadito es por equidad. Los planes pagos dan herramientas, no posiciones.</span></div>
+      <p className="mt-6 text-center text-sm text-gris">Pagar nunca te pone por encima de otros en las búsquedas.</p>
     </div>
   );
 }

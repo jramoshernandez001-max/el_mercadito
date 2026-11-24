@@ -12,10 +12,7 @@ export default async function Explorar(props: PageProps<"/explorar">) {
   const negocios = await negociosVisibles(supabase);
   return (
     <div className="mx-auto max-w-[1080px] px-4">
-      <div className="pt-[22px] pb-1.5">
-        <h1 className="text-2xl font-bold tracking-[-0.03em]">Explorar</h1>
-        <p className="mt-1 text-sm text-gris">Todos los emprendimientos de Lorica, organizados.</p>
-      </div>
+      <h1 className="pt-6 text-2xl font-bold tracking-[-0.03em]">Buscar</h1>
       <Explorador negocios={negocios} inicial={{ q: val("q"), cat: val("cat"), zona: val("zona"), tipo: val("tipo") }} />
     </div>
   );

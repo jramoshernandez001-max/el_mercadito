@@ -1,15 +1,15 @@
-export type Categoria = { id: string; n: string; e: string; c: string };
+export type Categoria = { id: string; n: string; corto: string; e: string; c: string };
 
 export const CATS: Categoria[] = [
-  { id: "comida", n: "Comida y bebidas", e: "🍲", c: "#F59E0B" },
-  { id: "moda", n: "Moda y accesorios", e: "👕", c: "#EC4899" },
-  { id: "artesanias", n: "Artesanías", e: "🧺", c: "#B7791F" },
-  { id: "belleza", n: "Belleza y cuidado", e: "💅", c: "#C026D3" },
-  { id: "tecnologia", n: "Tecnología y reparaciones", e: "📱", c: "#3B82F6" },
-  { id: "hogar", n: "Hogar y plantas", e: "🪴", c: "#10B981" },
-  { id: "servicios", n: "Servicios profesionales", e: "🛠️", c: "#6366F1" },
-  { id: "clases", n: "Clases y tutorías", e: "📚", c: "#0EA5E9" },
-  { id: "eventos", n: "Eventos y fiestas", e: "🎉", c: "#EF4444" },
+  { id: "comida", corto: "Comida", n: "Comida y bebidas", e: "🍲", c: "#F59E0B" },
+  { id: "moda", corto: "Moda", n: "Moda y accesorios", e: "👕", c: "#EC4899" },
+  { id: "artesanias", corto: "Artesanías", n: "Artesanías", e: "🧺", c: "#B7791F" },
+  { id: "belleza", corto: "Belleza", n: "Belleza y cuidado", e: "💅", c: "#C026D3" },
+  { id: "tecnologia", corto: "Tecnología", n: "Tecnología y reparaciones", e: "📱", c: "#3B82F6" },
+  { id: "hogar", corto: "Hogar", n: "Hogar y plantas", e: "🪴", c: "#10B981" },
+  { id: "servicios", corto: "Servicios", n: "Servicios profesionales", e: "🛠️", c: "#6366F1" },
+  { id: "clases", corto: "Clases", n: "Clases y tutorías", e: "📚", c: "#0EA5E9" },
+  { id: "eventos", corto: "Eventos", n: "Eventos y fiestas", e: "🎉", c: "#EF4444" },
 ];
 
 export const ZONAS = ["Centro", "Mercado Público", "Zona Norte", "Zona Sur", "Ribera del Sinú", "Corregimientos"] as const;
@@ -57,7 +57,7 @@ export type Negocio = {
 };
 
 export const cat = (id: string): Categoria =>
-  CATS.find((c) => c.id === id) ?? { id: "otros", n: "Otros", e: "🛍️", c: "#64748B" };
+  CATS.find((c) => c.id === id) ?? { id: "otros", n: "Otros", corto: "Otros", e: "🛍️", c: "#64748B" };
 
 export const cop = (n: number | null | undefined) =>
   n == null ? "" : "$" + Number(n).toLocaleString("es-CO");

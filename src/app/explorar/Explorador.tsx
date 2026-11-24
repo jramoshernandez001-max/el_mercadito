@@ -11,7 +11,6 @@ export function Explorador({ negocios, inicial }: { negocios: Negocio[]; inicial
   const router = useRouter();
   const ruta = usePathname();
 
-  // Mantiene la URL compartible sin recargar
   useEffect(() => {
     const t = setTimeout(() => {
       const p = new URLSearchParams();
@@ -45,50 +44,46 @@ export function Explorador({ negocios, inicial }: { negocios: Negocio[]; inicial
 
   return (
     <>
-      <div className="mt-[14px] flex flex-col gap-[10px]">
-        <label className="flex items-center rounded-xl border-[1.5px] border-linea bg-white px-3 focus-within:border-verde">
-          🔎
+      <div className="mt-4 flex gap-2">
+        <label className="flex min-w-0 flex-1 items-center gap-2 rounded-full bg-white px-4 shadow-tarjeta focus-within:ring-2 focus-within:ring-verde">
+          <span aria-hidden>🔎</span>
           <input
             value={f.q}
             onChange={(e) => set("q", e.target.value)}
-            placeholder="Buscar por nombre, producto o servicio"
+            placeholder="¿Qué buscas?"
             autoComplete="off"
-            className="min-w-0 flex-1 bg-transparent px-1.5 py-[11px] text-base outline-none"
+            className="min-w-0 flex-1 bg-transparent py-3 text-base outline-none"
           />
+          {f.q && <button aria-label="Borrar" onClick={() => set("q", "")} className="text-gris">✕</button>}
         </label>
-        <div className="scroll-oculto flex gap-2 overflow-x-auto pb-1">
-          <button className={!f.cat ? "chip-on" : "chip"} onClick={() => set("cat", "")}>Todas</button>
-          {CATS.map((c) => (
-            <button key={c.id} className={f.cat === c.id ? "chip-on" : "chip"} onClick={() => set("cat", c.id)}>
-              {c.e} {c.n}
-            </button>
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-[10px]">
-          <select aria-label="Zona" value={f.zona} onChange={(e) => set("zona", e.target.value)} className="campo min-w-[140px] flex-1">
-            <option value="">Todas las zonas</option>
-            {ZONAS.map((z) => <option key={z}>{z}</option>)}
-          </select>
-          <select aria-label="Tipo" value={f.tipo} onChange={(e) => set("tipo", e.target.value)} className="campo min-w-[140px] flex-1">
-            <option value="">Productos y servicios</option>
-            <option value="producto">Solo productos</option>
-            <option value="servicio">Solo servicios</option>
-          </select>
-        </div>
+        <select
+          aria-label="Zona"
+          value={f.zona}
+          onChange={(e) => set("zona", e.target.value)}
+          className={`w-[118px] rounded-full px-3 text-sm font-semibold shadow-tarjeta outline-none sm:w-[170px] ${f.zona ? "bg-navy text-white" : "bg-white"}`}
+        >
+          <option value="">📍 Zona</option>
+          {ZONAS.map((z) => <option key={z} value={z}>{z}</option>)}
+        </select>
       </div>
-      <div className="mt-4 mb-[10px] text-[13px] text-gris">
-        {lista.length} resultado{lista.length === 1 ? "" : "s"} · orden rotativo equitativo
-        {hayFiltros && (
-          <>
-            {" · "}
-            <button className="font-bold text-verde" onClick={() => setF({ q: "", cat: "", zona: "", tipo: "" })}>Limpiar filtros</button>
-          </>
-        )}
+
+      <div className="scroll-oculto -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
+        {CATS.map((c) => (
+          <button key={c.id} className={f.cat === c.id ? "chip-on" : "chip"} onClick={() => set("cat", f.cat === c.id ? "" : c.id)}>
+            {c.e} {c.corto}
+          </button>
+        ))}
       </div>
+
+      <div className="mt-4 mb-3 flex items-center justify-between text-[13px] text-gris">
+        <span>{lista.length} {lista.length === 1 ? "resultado" : "resultados"}</span>
+        {hayFiltros && <button className="font-bold text-verde" onClick={() => setF({ q: "", cat: "", zona: "", tipo: "" })}>Limpiar</button>}
+      </div>
+
       {lista.length ? (
         <Rejilla>{lista.map((n) => <TarjetaNegocio key={n.id} n={n} />)}</Rejilla>
       ) : (
-        <Vacio e="🔍" titulo="Nada por aquí todavía" texto="Prueba otra palabra o quita algún filtro." />
+        <Vacio e="🔍" titulo="Sin resultados" texto="Prueba con otra palabra." />
       )}
     </>
   );

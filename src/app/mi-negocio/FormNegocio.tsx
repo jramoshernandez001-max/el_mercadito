@@ -132,22 +132,15 @@ export function FormNegocio({ uid, negocio }: { uid: string; negocio: (Negocio &
 
   if (!creando)
     return (
-      <>
-        <div className="panel mt-3 px-5! py-[30px]! text-center">
-          <div className="text-[46px]">🏪</div>
-          <h3 className="mt-2 mb-1.5 text-xl font-bold">Publica tu emprendimiento gratis</h3>
-          <p className="mx-auto mb-[18px] max-w-[420px] text-gris">Perfil permanente, catálogo de hasta {LIMITE.basico} productos o servicios y contacto directo por WhatsApp. Sin pagar pauta.</p>
-          <button className="btn-verde" onClick={() => setCreando(true)}>Crear mi perfil</button>
-        </div>
-        <div className="mt-[14px] grid grid-cols-3 gap-[10px]">
-          {["Llena tus datos", "Sube productos con foto", "Recibe mensajes por WhatsApp"].map((t, i) => (
-            <div key={t} className="rounded-[14px] bg-white p-[14px] shadow-tarjeta"><b className="block text-2xl">{i + 1}</b><span className="text-xs font-semibold text-gris">{t}</span></div>
-          ))}
-        </div>
-      </>
+      <div className="mt-6 rounded-2xl bg-white px-6 py-12 text-center shadow-tarjeta">
+        <div className="text-5xl">🏪</div>
+        <h2 className="mt-4 text-xl font-bold">Publica tu negocio gratis</h2>
+        <p className="mt-1 text-sm text-gris">Te toma menos de 5 minutos.</p>
+        <button className="btn-verde mt-6" onClick={() => setCreando(true)}>Crear mi perfil</button>
+      </div>
     );
 
-  const campo = (k: keyof typeof vacio, label: React.ReactNode, props: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
+  const campo = (k: keyof typeof vacio, label: string, props: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
     <label className="etiqueta">
       {label}
       <input className="campo" value={d[k]} onChange={(e) => set(k, e.target.value)} {...props} />
@@ -156,105 +149,99 @@ export function FormNegocio({ uid, negocio }: { uid: string; negocio: (Negocio &
 
   return (
     <>
-      <div className="panel mt-[14px]">
-        <h3 className="mb-3 font-bold">Datos del emprendimiento</h3>
-        <div className="grid gap-3">
-          <div className="flex items-center gap-[14px]">
-            <label className="relative grid h-[92px] w-[92px] cursor-pointer place-items-center overflow-hidden rounded-[20px] border-2 border-dashed border-[#C9D1DC] bg-[#EEF1F5] text-center text-xs text-gris">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              {d.logo_url ? <img src={d.logo_url} alt="Logo" className="h-full w-full object-cover" /> : subiendo === "logo" ? "Subiendo…" : <>Subir<br />logo</>}
-              <input type="file" accept="image/*" className="absolute inset-0 cursor-pointer opacity-0" onChange={(e) => subir(e.target.files?.[0], "logo")} />
-            </label>
-            <div className="flex-1 text-[13px] text-gris">
-              Tu logo o una foto que te represente. Se ajusta automáticamente.
-              {d.logo_url && <><br /><button className="font-bold text-verde" onClick={() => set("logo_url", "")}>Quitar logo</button></>}
-            </div>
-          </div>
-          {campo("nombre", "Nombre del emprendimiento *", { maxLength: 60, placeholder: "Ej: Butifarras Doña Mery" })}
-          {campo("eslogan", <span>Frase corta <span className="font-medium text-gris">(opcional)</span></span>, { maxLength: 70, placeholder: "Ej: Sabor costeño desde el mercado" })}
-          <label className="etiqueta">
-            Descripción
-            <textarea className="campo" rows={3} maxLength={500} value={d.descripcion} onChange={(e) => set("descripcion", e.target.value)} placeholder="Qué vendes u ofreces, cómo entregas, etc." />
+      <section className="mt-6 grid gap-4 rounded-2xl bg-white p-5 shadow-tarjeta">
+        <div className="flex items-center gap-4">
+          <label className="relative grid h-20 w-20 flex-none cursor-pointer place-items-center overflow-hidden rounded-2xl bg-fondo text-center text-[11px] font-semibold text-gris ring-1 ring-linea">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {d.logo_url ? <img src={d.logo_url} alt="Logo" className="h-full w-full object-cover" /> : subiendo === "logo" ? "…" : <span className="text-2xl">📷<br /><span className="text-[11px]">Logo</span></span>}
+            <input type="file" accept="image/*" aria-label="Subir logo" className="absolute inset-0 cursor-pointer opacity-0" onChange={(e) => subir(e.target.files?.[0], "logo")} />
           </label>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="flex-1">{campo("nombre", "Nombre", { maxLength: 60, placeholder: "Butifarras Doña Mery" })}</div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="etiqueta">
+            Categoría
+            <select className="campo" value={d.categoria} onChange={(e) => set("categoria", e.target.value)}>
+              <option value="">Elige</option>
+              {CATS.map((c) => <option key={c.id} value={c.id}>{c.e} {c.corto}</option>)}
+            </select>
+          </label>
+          <label className="etiqueta">
+            Zona
+            <select className="campo" value={d.zona} onChange={(e) => set("zona", e.target.value)}>
+              <option value="">Elige</option>
+              {ZONAS.map((z) => <option key={z}>{z}</option>)}
+            </select>
+          </label>
+        </div>
+        {campo("whatsapp", "WhatsApp", { inputMode: "tel", maxLength: 15, placeholder: "300 123 4567" })}
+        <label className="etiqueta">
+          Descripción
+          <textarea className="campo" rows={2} maxLength={500} value={d.descripcion} onChange={(e) => set("descripcion", e.target.value)} placeholder="¿Qué ofreces?" />
+        </label>
+        <details className="group">
+          <summary className="cursor-pointer list-none text-sm font-bold text-verde [&::-webkit-details-marker]:hidden">
+            <span className="group-open:hidden">+ Más detalles</span><span className="hidden group-open:inline">− Menos detalles</span>
+          </summary>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <label className="etiqueta">
-              Categoría *
-              <select className="campo" value={d.categoria} onChange={(e) => set("categoria", e.target.value)}>
-                <option value="">Elige…</option>
-                {CATS.map((c) => <option key={c.id} value={c.id}>{c.e} {c.n}</option>)}
-              </select>
-            </label>
-            <label className="etiqueta">
-              Zona de Lorica *
-              <select className="campo" value={d.zona} onChange={(e) => set("zona", e.target.value)}>
-                <option value="">Elige…</option>
-                {ZONAS.map((z) => <option key={z}>{z}</option>)}
-              </select>
-            </label>
-            <label className="etiqueta">
-              Ofreces *
+              Ofreces
               <select className="campo" value={d.tipo} onChange={(e) => set("tipo", e.target.value)}>
                 {Object.entries(TIPOS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </select>
             </label>
-            {campo("whatsapp", "WhatsApp *", { inputMode: "tel", maxLength: 15, placeholder: "300 123 4567" })}
-            {campo("instagram", <span>Instagram <span className="font-medium text-gris">(sin @)</span></span>, { maxLength: 30, placeholder: "minegocio" })}
             {campo("horario", "Horario", { maxLength: 60, placeholder: "Lun–Sáb 8 a.m. – 6 p.m." })}
+            {campo("instagram", "Instagram", { maxLength: 30, placeholder: "usuario (sin @)" })}
+            {campo("eslogan", "Frase corta", { maxLength: 70, placeholder: "Sabor costeño" })}
           </div>
-        </div>
-      </div>
+        </details>
+      </section>
 
-      <div className="panel mt-[14px]">
-        <div className="mb-[10px] flex items-baseline justify-between">
-          <h3 className="font-bold">Catálogo</h3>
-          <span className="text-xs text-gris">{prods.length}/{limite} {negocio?.plan === "premium" ? "(Premium)" : "(Básico)"}</span>
+      <section className="mt-4 rounded-2xl bg-white p-5 shadow-tarjeta">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="font-bold">Productos</h2>
+          <span className="text-xs text-gris">{prods.length} de {limite}</span>
         </div>
-        <div className="grid gap-3">
-          {prods.length === 0 && <p className="text-[13px] text-gris">Aún no tienes productos ni servicios.</p>}
+        <div className="grid gap-2">
           {prods.map((p) => (
-            <div key={p.key} className="grid grid-cols-[84px_1fr] items-start gap-3 rounded-[14px] border-[1.5px] border-linea p-3">
-              <label className="relative grid h-[84px] w-[84px] cursor-pointer place-items-center overflow-hidden rounded-xl bg-[#EEF1F5] text-center text-xs text-gris">
+            <div key={p.key} className="flex items-center gap-3">
+              <label className="relative grid h-14 w-14 flex-none cursor-pointer place-items-center overflow-hidden rounded-xl bg-fondo text-lg ring-1 ring-linea">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                {p.foto_url ? <img src={p.foto_url} alt="" className="h-full w-full object-cover" /> : subiendo === p.key ? "Subiendo…" : <>📷<br />Foto</>}
-                <input type="file" accept="image/*" className="absolute inset-0 cursor-pointer opacity-0" onChange={(e) => subir(e.target.files?.[0], p.key)} />
+                {p.foto_url ? <img src={p.foto_url} alt="" className="h-full w-full object-cover" /> : subiendo === p.key ? "…" : "📷"}
+                <input type="file" accept="image/*" aria-label="Foto del producto" className="absolute inset-0 cursor-pointer opacity-0" onChange={(e) => subir(e.target.files?.[0], p.key)} />
               </label>
-              <div className="grid gap-2">
-                <input className="campo" maxLength={60} value={p.nombre} onChange={(e) => setP(p.key, "nombre", e.target.value)} placeholder="Nombre del producto o servicio" />
-                <div className="grid grid-cols-2 gap-2">
-                  <input className="campo" inputMode="numeric" value={p.precio} onChange={(e) => setP(p.key, "precio", e.target.value)} placeholder="Precio (COP)" />
-                  <button className="btn-rojo btn-sm" onClick={() => setProds((ps) => ps.filter((x) => x.key !== p.key))}>Quitar</button>
-                </div>
-                <input className="campo" maxLength={120} value={p.descripcion} onChange={(e) => setP(p.key, "descripcion", e.target.value)} placeholder="Detalle corto (opcional)" />
-              </div>
+              <input className="campo min-w-0 flex-[2]" maxLength={60} value={p.nombre} onChange={(e) => setP(p.key, "nombre", e.target.value)} placeholder="Nombre" />
+              <input className="campo min-w-0 flex-1" inputMode="numeric" value={p.precio} onChange={(e) => setP(p.key, "precio", e.target.value)} placeholder="Precio" />
+              <button aria-label="Quitar" className="grid h-9 w-9 flex-none place-items-center rounded-full text-gris hover:bg-red-50 hover:text-red-600" onClick={() => setProds((ps) => ps.filter((x) => x.key !== p.key))}>✕</button>
             </div>
           ))}
         </div>
-        <div className="mt-3">
-          {prods.length < limite ? (
-            <button className="btn-borde" onClick={() => setProds((ps) => [...ps, { key: crypto.randomUUID(), nombre: "", precio: "", descripcion: "", foto_url: "" }])}>+ Agregar producto o servicio</button>
-          ) : (
-            <p className="text-[13px] text-gris">
-              Llegaste al límite de tu plan.{" "}
-              {negocio?.plan !== "premium" && <Link href="/planes" className="font-bold text-verde">Premium permite hasta {LIMITE.premium}.</Link>}
-            </p>
-          )}
-        </div>
-      </div>
+        {prods.length < limite ? (
+          <button
+            className="mt-3 w-full rounded-xl border-2 border-dashed border-linea py-3 text-sm font-bold text-gris hover:border-verde hover:text-verde"
+            onClick={() => setProds((ps) => [...ps, { key: crypto.randomUUID(), nombre: "", precio: "", descripcion: "", foto_url: "" }])}
+          >
+            + Agregar producto
+          </button>
+        ) : (
+          negocio?.plan !== "premium" && <Link href="/planes" className="mt-3 block text-center text-sm font-bold text-verde">¿Necesitas más? Mira Premium</Link>
+        )}
+      </section>
 
-      <div className="panel sticky bottom-[64px] z-10 mt-[14px] flex flex-wrap items-center gap-[10px] md:bottom-3">
-        <button className="btn-verde" onClick={guardar} disabled={guardando || !!subiendo}>
-          {guardando ? "Guardando…" : nid ? "Guardar cambios" : "Publicar mi perfil"}
+      <div className="sticky bottom-[72px] z-10 mt-4 flex items-center gap-2 rounded-2xl bg-white/95 p-3 shadow-tarjeta backdrop-blur md:bottom-3">
+        <button className="btn-verde flex-1" onClick={guardar} disabled={guardando || !!subiendo}>
+          {guardando ? "Guardando…" : nid ? "Guardar" : "Publicar"}
         </button>
         {nid ? (
-          <>
-            {negocio && <Link href={`/n/${negocio.slug}`} className="btn-borde">Ver mi perfil</Link>}
-            <button className="btn-rojo ml-auto" onClick={eliminar}>Eliminar</button>
-          </>
+          negocio && <Link href={`/n/${negocio.slug}`} className="btn-borde">Ver perfil</Link>
         ) : (
           <button className="btn-borde" onClick={() => setCreando(false)}>Cancelar</button>
         )}
-        {aviso && <p className={`w-full text-sm font-semibold ${aviso.err ? "text-red-600" : "text-verde"}`}>{aviso.t}</p>}
       </div>
+      {aviso && <p className={`mt-3 text-center text-sm font-semibold ${aviso.err ? "text-red-600" : "text-verde"}`}>{aviso.t}</p>}
+      {nid && (
+        <button className="mx-auto mt-8 block text-xs text-gris underline hover:text-red-600" onClick={eliminar}>Eliminar mi perfil</button>
+      )}
     </>
   );
 }

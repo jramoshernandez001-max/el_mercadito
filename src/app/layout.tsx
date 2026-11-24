@@ -23,20 +23,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className="sticky top-0 z-30 bg-navy text-white">
           <div className="mx-auto flex h-[60px] max-w-[1080px] items-center gap-3 px-4">
             <Link href="/" className="flex items-center gap-[10px] text-[19px] font-extrabold tracking-tight">
-              <LogoTienda />
-              <span>
-                El Mercadito
-                <small className="block text-[11px] font-medium tracking-normal opacity-70">Lorica, Córdoba</small>
-              </span>
+              <LogoTienda size={30} />
+              <span>El Mercadito</span>
             </Link>
             <Navegacion admin={admin} conSesion={!!user} />
           </div>
         </header>
         <main className="min-h-[70vh] pb-24 md:pb-10">{children}</main>
-        <footer className="px-4 pt-8 pb-28 text-center text-[12.5px] text-gris md:pb-6">
-          El Mercadito · Conectando el futuro de Lorica
-          <br />
-          Visibilidad equitativa: nadie paga por aparecer primero.
+        <footer className="flex flex-wrap justify-center gap-x-5 gap-y-1 px-4 pt-10 pb-28 text-[13px] text-gris md:pb-8">
+          <Link href="/como-funciona" className="hover:text-tinta">Cómo funciona</Link>
+          <Link href="/planes" className="hover:text-tinta">Planes</Link>
+          <span>© El Mercadito · Lorica</span>
         </footer>
       </body>
     </html>

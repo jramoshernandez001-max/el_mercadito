@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { TIPOS, cat, cop, waLink, type Negocio } from "@/lib/datos";
+import { cat, cop, waLink, type Negocio } from "@/lib/datos";
 import { usuarioActual } from "@/lib/supabase/server";
-import { LogoNegocio, portada } from "@/components/TarjetaNegocio";
-import { BotonCopiar, BotonWhatsApp, RegistrarVista } from "@/components/Metrica";
+import { LogoNegocio, Verificado } from "@/components/TarjetaNegocio";
+import { BotonWhatsApp, RegistrarVista } from "@/components/Metrica";
 
 async function cargar(slug: string) {
   const { supabase, user } = await usuarioActual();
@@ -35,83 +35,78 @@ export default async function PerfilNegocio(props: PageProps<"/n/[slug]">) {
   const productos = [...(n.productos ?? [])].sort((a, b) => a.orden - b.orden);
   const ig = n.instagram.replace(/[^A-Za-z0-9._]/g, "");
   const esMio = user?.id === n.owner_id;
-  const msg = `Hola ${n.nombre}, te encontré en El Mercadito 🛒 y quiero más información.`;
 
   return (
-    <div className="mx-auto max-w-[720px]">
+    <div className="mx-auto max-w-[680px] px-4">
       <RegistrarVista negocio={n.id} />
-      <div className="relative h-[130px] md:mt-6 md:rounded-t-[22px]" style={portada(c.c)}>
-        <Link href="/explorar" className="absolute top-3 left-3 rounded-full bg-white/90 px-3 py-1.5 text-sm font-bold">← Volver</Link>
-      </div>
-      <div className="relative -mt-10 px-[18px]">
-        <LogoNegocio n={n} className="h-[86px] w-[86px] rounded-[20px] border-4 border-white text-[38px]" />
-      </div>
-      <div className="px-[18px] pt-[14px] pb-6">
-        {n.oculto && <div className="mb-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">Este perfil está oculto por moderación. Solo tú y el equipo pueden verlo.</div>}
-        {esMio && (
-          <div className="mb-3 flex items-center gap-3 rounded-xl bg-verde-suave p-3 text-sm text-[#0e5e39]">
-            Así ven tu perfil los compradores. <Link href="/mi-negocio" className="ml-auto font-bold">Editar</Link>
-          </div>
-        )}
-        <h1 className="flex flex-wrap items-center gap-1.5 text-[22px] leading-tight font-bold tracking-tight">
-          {n.nombre}
-          {n.plan === "premium" && <span className="pill-verde">✓ Verificado</span>}
-        </h1>
-        {n.eslogan && <p className="mt-1 text-gris">{n.eslogan}</p>}
-        <div className="mt-[10px] flex flex-wrap gap-[5px]">
-          <span className="pill">📍 {n.zona}</span>
-          <span className="pill-verde">{c.e} {c.n}</span>
-          <span className="pill">{TIPOS[n.tipo]}</span>
-        </div>
-        {n.descripcion && <p className="mt-3 text-[14.5px] leading-relaxed whitespace-pre-line text-[#2B3A50]">{n.descripcion}</p>}
-        <div className="mt-[14px] grid gap-2 text-sm">
-          {n.horario && <div className="flex items-center gap-[10px] rounded-xl bg-white px-3 py-[10px]">🕒 <span>{n.horario}</span></div>}
-          <div className="flex items-center gap-[10px] rounded-xl bg-white px-3 py-[10px]">📱 <span>WhatsApp {n.whatsapp}</span><BotonCopiar texto={n.whatsapp} /></div>
-          {ig && (
-            <div className="flex items-center gap-[10px] rounded-xl bg-white px-3 py-[10px]">
-              📸 <a href={`https://instagram.com/${ig}`} target="_blank" rel="noopener noreferrer" className="underline">@{ig}</a>
-            </div>
-          )}
-        </div>
+      <Link href="/explorar" aria-label="Volver" className="mt-4 inline-grid h-10 w-10 place-items-center rounded-full bg-white text-lg shadow-tarjeta">←</Link>
 
-        {productos.length > 0 && (
-          <>
-            <div className="mt-5 mb-[10px] flex items-baseline justify-between">
-              <h2 className="text-[19px] font-bold tracking-tight">{n.tipo === "servicio" ? "Servicios" : "Catálogo"}</h2>
-              <span className="text-xs text-gris">{productos.length} publicados</span>
-            </div>
-            <div className="grid grid-cols-2 gap-[10px] sm:grid-cols-3">
-              {productos.map((p) => (
-                <div key={p.id} className="flex flex-col overflow-hidden rounded-[14px] bg-white shadow-tarjeta">
-                  <div className="grid aspect-square place-items-center overflow-hidden text-[34px]" style={{ background: c.c + "1f" }}>
-                    {p.foto_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.foto_url} alt={p.nombre} className="h-full w-full object-cover" loading="lazy" />
-                    ) : (
-                      c.e
-                    )}
-                  </div>
-                  <div className="flex flex-1 flex-col gap-[3px] px-[10px] pt-[9px] pb-[10px]">
-                    <h3 className="text-[13.5px] leading-tight font-bold">{p.nombre}</h3>
-                    {p.precio != null && <div className="text-sm font-extrabold text-verde">{cop(p.precio)}</div>}
-                    {p.descripcion && <div className="text-xs leading-snug text-gris">{p.descripcion}</div>}
-                    <BotonWhatsApp
-                      negocio={n.id}
-                      href={waLink(n.whatsapp, `Hola ${n.nombre}, vi "${p.nombre}" en El Mercadito 🛒 ¿Está disponible?`)}
-                      className="btn-wa btn-sm mt-auto w-full"
-                    >
-                      Pedir
-                    </BotonWhatsApp>
-                  </div>
+      {(n.oculto || esMio) && (
+        <div className="mt-4 flex items-center gap-3 rounded-xl bg-verde-suave px-4 py-3 text-sm text-[#0e5e39]">
+          {n.oculto ? "Perfil oculto por moderación." : "Este es tu perfil."}
+          {esMio && <Link href="/mi-negocio" className="ml-auto font-bold">Editar</Link>}
+        </div>
+      )}
+
+      <header className="mt-5 flex items-center gap-4">
+        <LogoNegocio n={n} className="h-20 w-20 flex-none rounded-2xl text-4xl shadow-tarjeta" />
+        <div className="min-w-0">
+          <h1 className="flex items-center gap-2 text-2xl leading-tight font-bold tracking-tight">
+            {n.nombre}
+            {n.plan === "premium" && <Verificado />}
+          </h1>
+          <p className="mt-1 text-sm text-gris">{c.e} {c.corto} · 📍 {n.zona}</p>
+        </div>
+      </header>
+
+      {(n.eslogan || n.descripcion) && (
+        <p className="mt-5 text-[15px] leading-relaxed whitespace-pre-line text-[#2B3A50]">{n.descripcion || n.eslogan}</p>
+      )}
+
+      {(n.horario || ig) && (
+        <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm text-gris">
+          {n.horario && <span>🕒 {n.horario}</span>}
+          {ig && <a href={`https://instagram.com/${ig}`} target="_blank" rel="noopener noreferrer" className="hover:text-tinta">📸 @{ig}</a>}
+        </div>
+      )}
+
+      {productos.length > 0 && (
+        <section className="mt-8">
+          <h2 className="mb-3 text-lg font-bold">{n.tipo === "servicio" ? "Servicios" : "Catálogo"}</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {productos.map((p) => (
+              <BotonWhatsApp
+                key={p.id}
+                negocio={n.id}
+                href={waLink(n.whatsapp, `Hola ${n.nombre}, vi "${p.nombre}" en El Mercadito 🛒 ¿Está disponible?`)}
+                className="group overflow-hidden rounded-2xl bg-white shadow-tarjeta"
+              >
+                <div className="grid aspect-square place-items-center overflow-hidden text-4xl" style={{ background: c.c + "1a" }}>
+                  {p.foto_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.foto_url} alt={p.nombre} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-105" />
+                  ) : (
+                    c.e
+                  )}
                 </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-      <div className="sticky bottom-[62px] z-20 bg-gradient-to-t from-fondo from-60% to-transparent px-[18px] pt-6 pb-3 md:bottom-0">
-        <BotonWhatsApp negocio={n.id} href={waLink(n.whatsapp, msg)} className="btn-wa w-full">
-          💬 Escribir por WhatsApp
+                <div className="p-3">
+                  <h3 className="truncate text-sm font-semibold">{p.nombre}</h3>
+                  {p.precio != null && <p className="mt-0.5 text-sm font-bold text-verde">{cop(p.precio)}</p>}
+                </div>
+              </BotonWhatsApp>
+            ))}
+          </div>
+          <p className="mt-2 text-center text-xs text-gris">Toca un producto para preguntar por él</p>
+        </section>
+      )}
+
+      <div className="sticky bottom-[68px] z-20 mt-6 pb-3 md:bottom-0">
+        <BotonWhatsApp
+          negocio={n.id}
+          href={waLink(n.whatsapp, `Hola ${n.nombre}, te encontré en El Mercadito 🛒 y quiero más información.`)}
+          className="btn-wa w-full py-4! text-base! shadow-[0_8px_24px_rgba(37,211,102,.35)]"
+        >
+          Escribir por WhatsApp
         </BotonWhatsApp>
       </div>
     </div>
