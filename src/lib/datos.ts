@@ -21,7 +21,7 @@ export const TIPOS: Record<string, string> = {
 };
 
 export const LIMITE = { basico: 6, premium: 15 } as const;
-export const PRECIO_PREMIUM = 12000;
+export const PRECIO_PREMIUM = 30000;
 export const PRECIO_ANUNCIO = 20000;
 /** WhatsApp del equipo de El Mercadito para coordinar pagos (variable de entorno). */
 export const WHATSAPP_EQUIPO = process.env.NEXT_PUBLIC_WHATSAPP_EQUIPO ?? "";
