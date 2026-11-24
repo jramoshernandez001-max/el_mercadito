@@ -44,7 +44,7 @@ export default async function Inicio() {
       </section>
 
       <div className="relative mx-auto -mt-10 max-w-[1080px] px-4">
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-[10px]">
+        <div className="grid grid-cols-3 gap-[10px] sm:grid-cols-[repeat(auto-fill,minmax(110px,1fr))] lg:grid-cols-9">
           {CATS.map((c) => (
             <Link
               key={c.id}
