@@ -6,10 +6,21 @@ import { solicitarPremium } from "./acciones";
 
 export const metadata: Metadata = { title: "Planes", description: "Perfil básico gratis para siempre. Premium y anuncios locales para crecer." };
 
-function Lista({ items }: { items: string[] }) {
+function Lista({ items }: { items: (string | [string, string])[] }) {
   return (
     <ul className="grid gap-2 text-sm">
-      {items.map((t) => <li key={t} className="flex gap-2"><span className="font-bold text-verde">✓</span>{t}</li>)}
+      {items.map((t) => {
+        const [texto, tag] = Array.isArray(t) ? t : [t, ""];
+        return (
+          <li key={texto} className="flex gap-2">
+            <span className="font-bold text-verde">✓</span>
+            <span>
+              {texto}
+              {tag && <span className="ml-1.5 rounded-full bg-amber-100 px-1.5 py-0.5 align-middle text-[10px] font-bold text-amber-800">{tag}</span>}
+            </span>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -47,19 +58,19 @@ export default async function Planes() {
         <div className={tarjeta}>
           <h3 className="font-bold">Básico</h3>
           <p className="text-3xl font-extrabold tracking-tight">Gratis</p>
-          <Lista items={["Perfil permanente", `${LIMITE.basico} productos`, "Contacto por WhatsApp"]} />
+          <Lista items={["Perfil permanente", `Hasta ${LIMITE.basico} productos con foto`, "Contacto directo por WhatsApp", "Aparece en búsquedas y categorías", "Visitas y clics totales"]} />
           <Link href="/mi-negocio" className="btn-borde mt-auto w-full">{negocio ? "Mi negocio" : "Empezar"}</Link>
         </div>
         <div className={`${tarjeta} ring-2 ring-verde`}>
           <h3 className="font-bold">Premium</h3>
           <p className="text-3xl font-extrabold tracking-tight">{cop(PRECIO_PREMIUM)}<span className="text-sm font-semibold text-gris"> /mes</span></p>
-          <Lista items={[`${LIMITE.premium} productos`, "Insignia de verificado", "Estadísticas por día"]} />
+          <Lista items={["Todo lo del plan Básico", `Hasta ${LIMITE.premium} productos con foto`, ["Chatbot que atiende a tus clientes y te envía solo los pedidos cerrados a WhatsApp", "Pronto"], "Insignia de verificado", "Estadísticas de visitas por día", "Prioridad para reservar anuncios"]} />
           <div className="mt-auto">{botonPremium}</div>
         </div>
         <div className={tarjeta}>
           <h3 className="font-bold">Anuncio</h3>
           <p className="text-3xl font-extrabold tracking-tight">{cop(PRECIO_ANUNCIO)}<span className="text-sm font-semibold text-gris"> /semana</span></p>
-          <Lista items={["Banner en el inicio", "Enlace a tu perfil"]} />
+          <Lista items={["Banner en la página de inicio", "7 días de visibilidad", "Enlace directo a tu perfil", "Texto y color a tu gusto"]} />
           {WHATSAPP_EQUIPO ? (
             <a className="btn-borde mt-auto w-full" target="_blank" rel="noopener noreferrer" href={waLink(WHATSAPP_EQUIPO, "Hola, quiero reservar un anuncio en El Mercadito.")}>Reservar</a>
           ) : (
@@ -67,7 +78,6 @@ export default async function Planes() {
           )}
         </div>
       </div>
-      <p className="mt-6 text-center text-sm text-gris">Pagar nunca te pone por encima de otros en las búsquedas.</p>
     </div>
   );
 }
